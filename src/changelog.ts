@@ -15,6 +15,15 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
+    version: '2.4',
+    date: '2026-11-23',
+    title: 'Aucune sauvegarde ne peut plus bloquer l\'app',
+    changes: [
+      'Chaque élément d\'un fichier de sauvegarde est vérifié avant l\'import : un fichier modifié ou abîmé est refusé, avec l\'endroit du problème.',
+      'Si l\'app ne peut plus s\'afficher, un écran de secours remplace la page blanche : revenir à une copie automatique, importer ou exporter tes données.',
+    ],
+  },
+  {
     version: '2.3',
     date: '2026-11-23',
     title: 'L\'app s\'appelle maintenant Dayset, et les sauvegardes sont plus sûres',

@@ -66,7 +66,7 @@ Because nothing is synced, export a backup from time to time in the settings.
 | PWA | `vite-plugin-pwa` (Workbox service worker, web manifest, update prompt) |
 | Drag and drop | dnd-kit |
 | Dates | date-fns |
-| Tests | Vitest + fake-indexeddb, 170 tests on the business rules |
+| Tests | Vitest + fake-indexeddb, 182 tests on the business rules |
 | CI/CD | GitHub Actions → GitHub Pages, optional SFTP deployment |
 
 ### Implementation notes

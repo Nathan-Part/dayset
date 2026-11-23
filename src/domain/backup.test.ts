@@ -70,6 +70,38 @@ describe('sauvegarde : un fichier abîmé ne touche à rien', () => {
   })
 })
 
+describe('sauvegarde trafiquée : refusée avant qu\'elle puisse bloquer l\'app', () => {
+  type Tables = Record<string, Record<string, unknown>[]>
+  const traps: Record<string, (t: Tables) => void> = {
+    'routine sans fréquence': (t) => delete t.routines[0].frequency,
+    'fréquence « jours » sans jours': (t) => (t.routines[0].frequency = { type: 'weekdays' }),
+    'fréquence tous les 0 jours': (t) => (t.routines[0].frequency = { type: 'interval', intervalDays: 0 }),
+    'étapes de routine qui ne sont pas une liste': (t) => (t.routines[0].steps = 'oups' as never),
+    'temps disponible en texte': (t) => t.meta.push({ key: 'capacityMin', value: 'beaucoup' }),
+    'temps disponible sur 3 jours': (t) => t.meta.push({ key: 'capacityMin', value: [60, 60, 60] }),
+    'nom de tâche = nombre': (t) => (t.tasks[0].name = 123),
+    'passage sans date': (t) => delete t.entries[0].date,
+    'statut inconnu': (t) => (t.entries[0].status = 'bof'),
+    'durée en texte': (t) => t.sessions.push({ id: 's', entryId: 'e', date: MON, durationSec: 'abc', source: 'manual', running: 0 }),
+    'passage de routine sans routine': (t) => t.entries.push({ id: 'x', kind: 'routine', date: MON, status: 'todo', position: 1 }),
+  }
+  for (const [name, mutate] of Object.entries(traps)) {
+    it(name, async () => {
+      const before = await exportData(db)
+      const data = JSON.parse(before)
+      mutate(data.tables)
+      await expect(importData(db, JSON.stringify(data))).rejects.toThrow('Donnée invalide')
+      expect(strip(await exportData(db))).toBe(strip(before))
+    })
+  }
+
+  it('un nom avec des balises reste du texte : accepté', async () => {
+    const data = JSON.parse(await exportData(db))
+    data.tables.tasks[0].name = '<script>alert(1)</script>'
+    await expect(importData(db, JSON.stringify(data))).resolves.toBeTruthy()
+  })
+})
+
 describe('import d\'un fichier : l\'état actuel est gardé dans le tiroir', () => {
   it('on peut revenir à ce qu\'on avait avant l\'import', async () => {
     const mine = await exportData(db)

@@ -1,4 +1,5 @@
 import type { AppDB } from '../db'
+import { findInvalidRow } from './validate'
 
 // Identifiant interne des sauvegardes : il ne change pas avec le nom de l'app,
 // sinon les fichiers déjà exportés seraient refusés.
@@ -33,6 +34,9 @@ export async function importData(d: AppDB, json: string): Promise<{ rows: number
   }
   // un export contient toujours toutes les tables : un fichier incomplet effacerait des données
   if (d.tables.some((t) => !Array.isArray(tables[t.name]))) throw new Error(`Sauvegarde incomplète. ${DAMAGED}`)
+  // contenu de chaque enregistrement : un fichier trafiqué pourrait empêcher l'app de s'afficher
+  const invalid = findInvalidRow(tables)
+  if (invalid) throw new Error(`Donnée invalide : ${invalid}. ${DAMAGED}`)
   let rows = 0
   try {
     await d.transaction('rw', d.tables, async () => {
