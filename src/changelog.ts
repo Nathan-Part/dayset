@@ -15,6 +15,14 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
+    version: '2.2',
+    date: '2026-11-23',
+    title: 'Code source ouvert à tous',
+    changes: [
+      'Rien ne change dans l\'app : son code est maintenant consultable publiquement, avec une explication pour l\'installer soi-même.',
+    ],
+  },
+  {
     version: '2.1',
     date: '2026-11-23',
     title: 'Regarder en arrière les semaines de routines',

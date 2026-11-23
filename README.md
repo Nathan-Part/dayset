@@ -10,7 +10,7 @@ It answers three questions every morning:
 2. **Where does my time really go?**
 3. **What did I actually get done?**
 
-> The user interface is in French (it was built for my own daily use). The code, tests and documentation are commented in French as well.
+> The user interface is in French (it was built for my own daily use). Code comments and the functional specification are in French too; this README is in English.
 
 ---
 
@@ -55,7 +55,7 @@ It answers three questions every morning:
 | Build | Vite 8, `vite-plugin-pwa` (installable, works offline) |
 | Storage | IndexedDB through Dexie 4 — data never leaves the device |
 | Drag & drop | dnd-kit |
-| Tests | Vitest + fake-indexeddb (57 tests on business rules), Playwright for end-to-end checks |
+| Tests | Vitest + fake-indexeddb (160 tests on business rules) |
 | CI/CD | GitHub Actions: type-check, tests and build on every push; optional SFTP deployment |
 
 No backend, no account, no tracking.
@@ -87,21 +87,46 @@ The full functional specification (in French) is in [`docs/cahier-des-charges.md
 
 ## Getting started
 
-Requirements: Node.js 22+.
+Don't want to use the live demo? Run the app on your own machine.
+
+**Requirements:** [Node.js](https://nodejs.org/) 22 or later (check with `node -v`) and Git.
+
+**1. Get the code and install dependencies**
 
 ```bash
+git clone https://github.com/Nathan-Part/todo-list.git
+cd todo-list
 npm install
-npm run dev        # http://localhost:5173
-npm test           # business-rule tests
-npm run typecheck
-npm run build      # production build in dist/
 ```
 
-To use it on an iPhone: open the live demo in Safari, then **Share → Add to Home Screen**.
+**2. Start the app**
 
-Every push to `main` publishes the app to GitHub Pages (`.github/workflows/pages.yml`). To host it at the root of your own domain instead, build with the default base path (`npm run build`).
+```bash
+npm run dev
+```
 
-### Optional deployment
+Open **http://localhost:5173** in your browser. The terminal also prints a *Network* address (e.g. `http://192.168.1.20:5173`): open it on a phone connected to the same Wi-Fi to try the app on mobile.
+
+**3. Other commands**
+
+```bash
+npm test           # business-rule tests
+npm run typecheck  # TypeScript checks
+npm run build      # production build in dist/
+npm run preview    # serve the production build (offline mode and install prompt work here)
+```
+
+All data is stored locally in your browser (IndexedDB): nothing is sent anywhere.
+
+### Install it on a phone
+
+To use it like a native app on an iPhone: open the live demo (or your own deployment) in Safari, then **Share → Add to Home Screen**.
+
+### Deploy your own copy
+
+Every push to `main` publishes the app to GitHub Pages (`.github/workflows/pages.yml`). On a fork, enable Pages in **Settings → Pages → Source: GitHub Actions**. To host it at the root of your own domain instead, build with the default base path (`npm run build`) and upload `dist/`.
+
+### Optional SFTP deployment
 
 `.github/workflows/deploy.yml` uploads the build over SFTP when `main` changes. It stays disabled until you set the repository variable `DEPLOY_ENABLED=true` and the secrets `SFTP_HOST`, `SFTP_USER`, `SFTP_PASSWORD` and `SFTP_DIR`.
 
