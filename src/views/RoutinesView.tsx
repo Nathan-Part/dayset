@@ -89,6 +89,7 @@ export function RoutinesView() {
   const toast = useToast()
   const [showArchived, setShowArchived] = useState(false)
   const [order, setOrder] = useState<string[] | null>(null)
+  const [weeksBack, setWeeksBack] = useState(0)
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 8 } }),
@@ -99,11 +100,11 @@ export function RoutinesView() {
     const routines = all.filter((r) => !r.archivedAt).sort((a, b) => a.position - b.position)
     // lectures lancées ensemble pour rester suivies en direct (voir domain/queries.ts)
     const [details, pauses] = await Promise.all([
-      Promise.all(routines.map((r) => loadRoutineDetail(db, r.id, today))),
+      Promise.all(routines.map((r) => loadRoutineDetail(db, r.id, today, weeksBack))),
       db.pauses.toArray(),
     ])
     return { details: details.filter((d): d is RoutineDetail => !!d), pauses, archived }
-  }, [today])
+  }, [today, weeksBack])
 
   const activeAll = data?.pauses.find(
     (p) => p.routineId === undefined && p.fromDate <= today && (p.toDate === undefined || p.toDate >= today),
@@ -120,7 +121,7 @@ export function RoutinesView() {
   const doneToday = new Set(
     (data?.details ?? [])
       .filter((d) => {
-        const g = d.grid.find((x) => x.day === today)
+        const g = weeksBack === 0 ? d.grid.find((x) => x.day === today) : undefined
         return g?.state === 'done' || g?.state === 'late'
       })
       .map((d) => d.routine.id),
@@ -192,6 +193,37 @@ export function RoutinesView() {
           </div>
         )
       )}
+
+      {data && data.details.length > 0 && (() => {
+        const last = data.details[0].grid
+        const from = last[last.length - 7]?.day
+        const to = last[last.length - 1]?.day
+        return (
+          <div className="mt-4 flex items-center justify-between rounded-2xl bg-surface px-2 py-1.5">
+            <button
+              type="button"
+              aria-label="Semaine précédente"
+              className="rounded-full p-2 text-muted"
+              onClick={() => setWeeksBack((w) => w + 1)}
+            >
+              <Icon name="left" className="size-4" />
+            </button>
+            <div className="text-center text-sm font-medium">
+              {weeksBack === 0 ? 'Cette semaine' : weeksBack === 1 ? 'Semaine dernière' : `Il y a ${weeksBack} semaines`}
+              {from && to && <div className="text-xs font-normal text-muted">{dayShort(from)} – {dayShort(to)}</div>}
+            </div>
+            <button
+              type="button"
+              aria-label="Semaine suivante"
+              disabled={weeksBack === 0}
+              className="rounded-full p-2 text-muted disabled:opacity-30"
+              onClick={() => setWeeksBack((w) => Math.max(0, w - 1))}
+            >
+              <Icon name="right" className="size-4" />
+            </button>
+          </div>
+        )
+      })()}
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
       <SortableContext items={details.map((d) => d.routine.id)} strategy={verticalListSortingStrategy}>
@@ -266,7 +298,7 @@ export function RoutinesView() {
                 </div>
               </div>
             </button>
-              {/* semaine en cours, de droite à gauche : dimanche à droite, samedi à gauche */}
+              {/* semaine affichée (en cours par défaut), de droite à gauche : dimanche à droite, samedi à gauche */}
               <div className="mt-3 flex flex-row-reverse gap-1.5">
                 {last7.map((g) => (
                   <button
