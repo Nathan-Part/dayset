@@ -323,7 +323,13 @@ export interface RoutineDetail {
   stats?: TimeStats
 }
 
-export async function loadRoutineDetail(d: AppDB, routineId: string, today: DayKey): Promise<RoutineDetail | null> {
+/** `weeksBack` : 0 = semaine en cours, 1 = la précédente… (ne change que la grille). */
+export async function loadRoutineDetail(
+  d: AppDB,
+  routineId: string,
+  today: DayKey,
+  weeksBack = 0,
+): Promise<RoutineDetail | null> {
   const routine = await d.routines.get(routineId)
   if (!routine) return null
   const entries = await d.entries.where('routineId').equals(routineId).toArray()
@@ -356,7 +362,7 @@ export async function loadRoutineDetail(d: AppDB, routineId: string, today: DayK
     return false
   }
 
-  const saturday = addDays(today, 6 - ((weekdayIndex(today) + 1) % 7)) // samedi de la semaine en cours (dimanche → samedi)
+  const saturday = addDays(today, 6 - ((weekdayIndex(today) + 1) % 7) - 7 * weeksBack) // samedi de la semaine en cours (dimanche → samedi)
   const days = daysBetween(addDays(saturday, -27), saturday)
   const grid = days.map((day) => {
     const e = entries.find((x) => x.date === day && x.status !== 'postponed') ?? entries.find((x) => x.date === day)
