@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
-// Chemin de publication : « / » sur un domaine dédié, « /todo-list/ » sur GitHub Pages.
+// Chemin de publication : « / » sur un domaine dédié, « /<nom du dépôt>/ » sur GitHub Pages.
 const base = process.env.BASE_PATH ?? '/'
 
 export default defineConfig({
@@ -15,8 +15,8 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Ma journée',
-        short_name: 'Ma journée',
+        name: 'Dayset',
+        short_name: 'Dayset',
         description: 'Tâches, routines et suivi du temps',
         lang: 'fr',
         start_url: base,

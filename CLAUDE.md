@@ -1,4 +1,4 @@
-# Ma journée — règles du projet
+# Dayset — règles du projet
 
 ## Historique des versions (obligatoire à chaque push sur `main`)
 

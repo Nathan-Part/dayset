@@ -78,11 +78,29 @@ export async function listCopies(c: CopiesDB): Promise<Omit<Copy, 'data'>[]> {
 export async function restoreCopy(d: AppDB, c: CopiesDB, id: string, today: DayKey, nowMs: number): Promise<number> {
   const copy = await c.copies.get(id)
   if (!copy) throw new Error('Copie introuvable.')
-  const current = await exportData(d)
-  await c.copies.put({ id: `before-${nowMs}`, day: today, createdAt: nowMs, kind: 'beforeRestore', data: current })
-  const { rows } = await importData(d, copy.data)
-  await pruneCopies(c, today)
-  return rows
+  return (await replaceKeepingCopy(d, c, copy.data, today, nowMs)).rows
+}
+
+/** Importe un fichier de sauvegarde ; l'état actuel est d'abord mis de côté dans le tiroir. */
+export function importFileKeepingCopy(d: AppDB, c: CopiesDB, json: string, today: DayKey, nowMs: number): Promise<{ rows: number }> {
+  return replaceKeepingCopy(d, c, json, today, nowMs)
+}
+
+/**
+ * Remplace toutes les données, après avoir rangé l'état actuel dans le tiroir (« état avant une restauration »).
+ * Si le remplacement échoue, rien n'a changé : la copie de sécurité, devenue inutile, est retirée.
+ */
+async function replaceKeepingCopy(d: AppDB, c: CopiesDB, json: string, today: DayKey, nowMs: number) {
+  const id = `before-${nowMs}`
+  await c.copies.put({ id, day: today, createdAt: nowMs, kind: 'beforeRestore', data: await exportData(d) })
+  try {
+    const res = await importData(d, json)
+    await pruneCopies(c, today)
+    return res
+  } catch (e) {
+    await c.copies.delete(id)
+    throw e
+  }
 }
 
 export async function copyData(c: CopiesDB, id: string): Promise<string | undefined> {

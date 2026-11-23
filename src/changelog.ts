@@ -15,6 +15,17 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
+    version: '2.3',
+    date: '2026-11-23',
+    title: 'L\'app s\'appelle maintenant Dayset, et les sauvegardes sont plus sûres',
+    changes: [
+      'Nouveau nom : Dayset. Tes données et tes anciens fichiers de sauvegarde restent valables.',
+      'Avant d\'importer un fichier, l\'état actuel est gardé dans les copies automatiques : une erreur peut être annulée.',
+      'Fermer la feuille de partage sans enregistrer ne compte plus comme un export, et le rappel reste affiché.',
+      'Un fichier incomplet ou abîmé est refusé avec un message clair, sans rien effacer.',
+    ],
+  },
+  {
     version: '2.2',
     date: '2026-11-23',
     title: 'Code source ouvert à tous',

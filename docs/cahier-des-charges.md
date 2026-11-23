@@ -66,7 +66,7 @@ Mieux connaître son temps n'est pas un objectif en soi. Le chrono est pourtant 
 | Langue | Français |
 | Développement | Développé avec l'aide de Claude (IA) |
 | Hébergement | OVH mutualisé, offre Starter ; un nom de domaine entier dédié à l'app |
-| Code | Dépôt GitHub `Nathan-Part/todo-list` (public depuis novembre 2026) |
+| Code | Dépôt GitHub `Nathan-Part/dayset` (public depuis novembre 2026) |
 | Budget | 0 € au-delà de l'hébergement OVH existant |
 | Notifications | Aucune en V1 |
 

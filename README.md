@@ -1,14 +1,14 @@
 <div align="center">
 
-<img src="public/favicon.svg" alt="Ma journée logo" width="88" height="88" />
+<img src="public/favicon.svg" alt="Dayset logo" width="88" height="88" />
 
-# Ma journée
+# Dayset
 
 **A daily planner, habit tracker and time tracker in one installable app.**
 
 Plan your day, check that it actually fits, time what you do and see where your hours really go, all stored on your device, with no account and no server.
 
-[**Live demo**](https://nathan-part.github.io/todo-list/) · [Features](#features) · [Tech stack](#tech-stack) · [Getting started](#getting-started)
+[**Live demo**](https://nathan-part.github.io/dayset/) · [Features](#features) · [Tech stack](#tech-stack) · [Getting started](#getting-started)
 
 ![React](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)
@@ -44,7 +44,7 @@ Every morning, the app answers three questions:
 - **Weekly review**: completion rate, time per category, estimate accuracy, and suggestions when a routine's estimate keeps drifting.
 - **"I'm going to bed"**: the day switches when you tap it, or automatically at 5 a.m.
 - **Gestures**: long-press and drag to reorder, swipe to postpone or delete, with undo.
-- **Automatic daily backup** on the device, plus export and import to a JSON file.
+- **Automatic daily backup** on the device, plus export and import to a JSON file. The current data is kept aside before every import, so a wrong file can be undone.
 - **Version history** inside the app, so you can see what each update brought.
 - **Works offline** and installs to the home screen like a native app.
 
@@ -52,7 +52,7 @@ Every morning, the app answers three questions:
 
 ## Privacy by design
 
-Ma journée is **local-first**. All data lives in the browser's IndexedDB on your device. Nothing is ever sent to a server, there is no account, no tracking and no analytics.
+Dayset is **local-first**. All data lives in the browser's IndexedDB on your device. Nothing is ever sent to a server, there is no account, no tracking and no analytics.
 
 Because nothing is synced, export a backup from time to time in the settings.
 
@@ -66,7 +66,7 @@ Because nothing is synced, export a backup from time to time in the settings.
 | PWA | `vite-plugin-pwa` (Workbox service worker, web manifest, update prompt) |
 | Drag and drop | dnd-kit |
 | Dates | date-fns |
-| Tests | Vitest + fake-indexeddb, 160 tests on the business rules |
+| Tests | Vitest + fake-indexeddb, 170 tests on the business rules |
 | CI/CD | GitHub Actions → GitHub Pages, optional SFTP deployment |
 
 ### Implementation notes
@@ -84,8 +84,8 @@ The full functional specification (in French) is in [`docs/cahier-des-charges.md
 Requires Node.js 22 or newer and Git.
 
 ```bash
-git clone https://github.com/Nathan-Part/todo-list.git
-cd todo-list
+git clone https://github.com/Nathan-Part/dayset.git
+cd dayset
 npm install
 npm run dev
 ```

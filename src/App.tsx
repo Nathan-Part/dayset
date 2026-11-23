@@ -62,7 +62,7 @@ function InstallScreen() {
         </li>
         <li className="flex gap-3">
           <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-accent-soft font-semibold text-accent">3</span>
-          <span>Ferme Safari et ouvre <strong>Ma journée</strong> depuis l'icône.</span>
+          <span>Ferme Safari et ouvre <strong>Dayset</strong> depuis l'icône.</span>
         </li>
       </ol>
     </div>

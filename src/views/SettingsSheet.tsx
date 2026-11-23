@@ -5,8 +5,9 @@ import { CapacityEditor } from '../components/CapacityEditor'
 import { CATEGORY_COLORS, CategoryDot, Field, Icon, Sheet, btnGhost, btnSoft, inputClass } from '../components/ui'
 import { DEFAULT_CAPACITY, META, db, getMeta, setMeta } from '../db'
 import { archiveCategory, saveCategory } from '../domain/actions'
-import { exportData, importData } from '../domain/backup'
-import { copiesDb, copyData, listCopies, restoreCopy } from '../domain/copies'
+import { exportData } from '../domain/backup'
+import { copiesDb, copyData, importFileKeepingCopy, listCopies, restoreCopy } from '../domain/copies'
+import { dayKeyOf } from '../domain/dates'
 import { dayLabel, dayShort, timeOfDay } from '../lib/format'
 import { saveTextFile } from '../lib/files'
 import { useCategories } from '../lib/hooks'
@@ -17,22 +18,24 @@ export function SettingsSheet({ onClose }: { onClose: () => void }) {
   const capacity = useLiveQuery(() => getMeta<number[]>(db, META.capacity, DEFAULT_CAPACITY), []) ?? DEFAULT_CAPACITY
   const { active } = useCategories()
   const toast = useToast()
+  const { today } = useNav()
   const fileRef = useRef<HTMLInputElement>(null)
   const [newName, setNewName] = useState('')
   const [busy, setBusy] = useState(false)
 
   async function doExport() {
     const json = await exportData(db)
-    const stamp = new Date().toISOString().slice(0, 10)
-    await saveTextFile(`ma-journee-${stamp}.json`, json)
-    await setMeta(db, 'lastExport', Date.now())
+    // date du calendrier local (pas UTC : sinon la veille entre minuit et 2-3 h)
+    const saved = await saveTextFile(`dayset-${dayKeyOf(Date.now())}.json`, json)
+    // feuille de partage fermée sans enregistrer : ce n'est pas un export
+    if (saved) await setMeta(db, 'lastExport', Date.now())
   }
 
   async function doImport(file: File) {
-    if (!window.confirm('Remplacer TOUTES les données actuelles par celles de ce fichier ?')) return
+    if (!window.confirm("Remplacer TOUTES les données actuelles par celles de ce fichier ? L'état actuel est d'abord gardé dans les copies automatiques.")) return
     setBusy(true)
     try {
-      const { rows } = await importData(db, await file.text())
+      const { rows } = await importFileKeepingCopy(db, copiesDb, await file.text(), today, Date.now())
       toast({ text: `Restauré : ${rows} enregistrements`, duration: 4000 })
       onClose()
     } catch (e) {
@@ -121,7 +124,7 @@ export function SettingsSheet({ onClose }: { onClose: () => void }) {
       <Field label="Mes données">
         <p className="text-sm text-muted">
           Tout est enregistré sur cet iPhone. Exporte régulièrement un fichier : c'est ta sauvegarde.
-          {lastExport ? ` Dernier export : ${dayShort(new Date(lastExport).toISOString().slice(0, 10))}.` : ' Aucun export pour l\'instant.'}
+          {lastExport ? ` Dernier export : ${dayShort(dayKeyOf(lastExport))}.` : ' Aucun export pour l\'instant.'}
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           <button type="button" className={btnSoft} onClick={() => void doExport()}>
@@ -146,7 +149,7 @@ export function SettingsSheet({ onClose }: { onClose: () => void }) {
 
       <CopiesField onRestored={onClose} />
 
-      <div className="mt-8 text-center text-xs text-muted">Ma journée · version {CURRENT_VERSION}</div>
+      <div className="mt-8 text-center text-xs text-muted">Dayset · version {CURRENT_VERSION}</div>
     </Sheet>
   )
 }
@@ -176,7 +179,7 @@ function CopiesField({ onRestored }: { onRestored: () => void }) {
   }
   const exportCopy = async (id: string, day: string) => {
     const data = await copyData(copiesDb, id)
-    if (data) await saveTextFile(`ma-journee-copie-${day}.json`, data)
+    if (data) await saveTextFile(`dayset-copie-${day}.json`, data)
   }
 
   return (

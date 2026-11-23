@@ -528,7 +528,7 @@ export function BilanView() {
           onClick={() => setSheet({ type: 'versions' })}
           className="rounded-full px-3 py-1.5 text-xs text-muted underline-offset-2 active:bg-surface"
         >
-          Ma journée · version <span className="font-semibold tabular">{CURRENT_VERSION}</span> · <span className="underline">nouveautés</span>
+          Dayset · version <span className="font-semibold tabular">{CURRENT_VERSION}</span> · <span className="underline">nouveautés</span>
         </button>
       </footer>
     </div>
