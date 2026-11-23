@@ -15,6 +15,15 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
+    version: '2.1',
+    date: '2026-11-23',
+    title: 'Regarder en arrière les semaines de routines',
+    changes: [
+      'Dans le menu Routines, des flèches permettent de revenir aux semaines précédentes et de revenir à la semaine en cours.',
+      'Chaque routine montre alors ses jours de la semaine choisie, et un appui sur un jour ouvre son détail.',
+    ],
+  },
+  {
     version: '2.0',
     date: '2026-11-21',
     title: 'Correction : choisir un jour dans l\'activité horaire',
