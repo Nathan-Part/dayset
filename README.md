@@ -19,6 +19,13 @@ Plan your day, check that it actually fits, time what you do and see where your 
 
 </div>
 
+<p align="center">
+  <img src="docs/screenshots/day.png" alt="Day view with the week strip, workload and a running timer" width="23%" />
+  <img src="docs/screenshots/review.png" alt="Weekly review: completion rate and time per category" width="23%" />
+  <img src="docs/screenshots/routines-dark.png" alt="Routines with completion rates in dark mode" width="23%" />
+  <img src="docs/screenshots/summary-dark.png" alt="Daily summary, step by step, in dark mode" width="23%" />
+</p>
+
 Every morning, the app answers three questions:
 
 1. **What do I have to do today, and does it fit in my day?**
