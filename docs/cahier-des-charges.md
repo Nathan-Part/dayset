@@ -64,7 +64,7 @@ Mieux connaître son temps n'est pas un objectif en soi. Le chrono est pourtant 
 | Appareil | iPhone uniquement, app installée sur l'écran d'accueil ; pas d'usage sur ordinateur |
 | Volume | Moins de 8 éléments par jour (routines et tâches confondues) |
 | Langue | Français |
-| Développement | Réalisé par Claude ; tu pilotes et tu n'as pas à toucher au code |
+| Développement | Développé avec l'aide de Claude (IA) |
 | Hébergement | OVH mutualisé, offre Starter ; un nom de domaine entier dédié à l'app |
 | Code | Dépôt GitHub `Nathan-Part/todo-list` (public depuis novembre 2026) |
 | Budget | 0 € au-delà de l'hébergement OVH existant |

@@ -1,141 +1,136 @@
-# Ma journée — daily planner & time tracker (PWA)
+<div align="center">
 
-**Live demo: https://nathan-part.github.io/todo-list/** (best on a phone)
+<img src="public/favicon.svg" alt="Ma journée logo" width="88" height="88" />
 
-A personal, offline-first Progressive Web App that combines a **to-do list**, a **habit tracker** and a **time tracker** around a single idea: *the day*.
+# Ma journée
 
-It answers three questions every morning:
+**A daily planner, habit tracker and time tracker in one installable app.**
 
-1. **What do I have to do today, and does it actually fit in my day?**
+Plan your day, check that it actually fits, time what you do and see where your hours really go, all stored on your device, with no account and no server.
+
+[**Live demo**](https://nathan-part.github.io/todo-list/) · [Features](#features) · [Tech stack](#tech-stack) · [Getting started](#getting-started)
+
+![React](https://img.shields.io/badge/React-19-61dafb?logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06b6d4?logo=tailwindcss&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-646cff?logo=vite&logoColor=white)
+![PWA](https://img.shields.io/badge/PWA-offline--ready-5a0fc8?logo=pwa&logoColor=white)
+[![License: MIT](https://img.shields.io/badge/License-MIT-22c55e)](LICENSE)
+
+</div>
+
+Every morning, the app answers three questions:
+
+1. **What do I have to do today, and does it fit in my day?**
 2. **Where does my time really go?**
 3. **What did I actually get done?**
 
-> The user interface is in French (it was built for my own daily use). Code comments and the functional specification are in French too; this README is in English.
-
----
-
 ## Features
 
-**Daily planning**
-- Day view with a week strip showing each day's planned workload against the time available (overloaded days turn red).
-- One-tap add: name, estimated duration, day or "backlog", category, optional deadline and note.
-- Manual ordering with long-press & drag; swipe left to push a task to tomorrow or back to the backlog.
-- Past days are read-only summaries; future days can be planned ahead.
+- **Day view**: a week strip shows each day's planned workload against the time available, and overloaded days turn red.
+- **Quick add**: name, estimated duration, day or backlog, category, optional fixed time, deadline and note.
+- **Nothing gets lost**: an unfinished task moves to the backlog at the end of the day, and a one-card-at-a-time review helps you reschedule it.
+- **Subtasks**: split a task into steps, each with its own estimate and timer.
+- **Routines**: every day, on chosen weekdays or every N days, with steps, pauses for holidays, an end date and completion rates over 7 and 30 days.
+- **Time tracking**: one timer at a time, a full-screen focus mode, a mini player on every tab and a "forgotten timer?" prompt after 3 hours.
+- **Daily summary**: what you did, at what time and for how long, with gaps in the day flagged so you can fill them in.
+- **Weekly review**: completion rate, time per category, estimate accuracy, and suggestions when a routine's estimate keeps drifting.
+- **"I'm going to bed"**: the day switches when you tap it, or automatically at 5 a.m.
+- **Gestures**: long-press and drag to reorder, swipe to postpone or delete, with undo.
+- **Automatic daily backup** on the device, plus export and import to a JSON file.
+- **Version history** inside the app, so you can see what each update brought.
+- **Works offline** and installs to the home screen like a native app.
 
-**Tasks that never silently disappear**
-- An unfinished task is never lost: at midnight it moves to a *backlog* and is flagged "to reschedule".
-- A one-card-at-a-time review lets you triage them: today, tomorrow, another day, keep, already done, delete.
-- Subtasks with their own estimate and timer; the parent's estimate is the sum of its steps.
+> The interface is in French.
 
-**Recurring routines (habits)**
-- Every day, specific weekdays, or every N days (fixed calendar).
-- A missed occurrence is recorded as "not done" — routines never pile up.
-- Optional routines: a missed day stays empty (not red) and doesn't hurt the completion rate.
-- Routine steps, each with its own estimate, checked per occurrence and timed one by one.
-- Skip or move a single occurrence, pause one or all routines (holidays), completion rate over 7 and 30 days.
-- Suggests adjusting a routine's estimate when the real time keeps drifting from it.
+## Privacy by design
 
-**Time tracking**
-- One running timer at a time, full-screen focus mode, mini player on every tab.
-- On a task or routine split into steps, the timer shows the current step's own time and estimate (with the total underneath).
-- Real time vs. estimate on every task, timeline of the day, "forgotten timer?" prompt after 3 hours.
-- Weekly review: completion rate, time per category, estimate accuracy, overloaded days, unplanned work.
+Ma journée is **local-first**. All data lives in the browser's IndexedDB on your device. Nothing is ever sent to a server, there is no account, no tracking and no analytics.
 
-**Reliable history**
-- Postponing a task leaves a trace on the original day; nothing is ever overwritten.
-- Handles midnight with a running timer, several days without opening the app, and clock changes — without duplicates.
-
----
+Because nothing is synced, export a backup from time to time in the settings.
 
 ## Tech stack
 
-| | |
-|---|---|
-| UI | React 19, TypeScript, Tailwind CSS 4 |
-| Build | Vite 8, `vite-plugin-pwa` (installable, works offline) |
-| Storage | IndexedDB through Dexie 4 — data never leaves the device |
-| Drag & drop | dnd-kit |
-| Tests | Vitest + fake-indexeddb (160 tests on business rules) |
-| CI/CD | GitHub Actions: type-check, tests and build on every push; optional SFTP deployment |
+| Area | Choice |
+| --- | --- |
+| UI | React 19, TypeScript (strict), Tailwind CSS 4 |
+| Build | Vite 8 |
+| Storage | IndexedDB via Dexie 4, with live queries (`dexie-react-hooks`) |
+| PWA | `vite-plugin-pwa` (Workbox service worker, web manifest, update prompt) |
+| Drag and drop | dnd-kit |
+| Dates | date-fns |
+| Tests | Vitest + fake-indexeddb, 160 tests on the business rules |
+| CI/CD | GitHub Actions → GitHub Pages, optional SFTP deployment |
 
-No backend, no account, no tracking.
+### Implementation notes
 
-## Architecture
-
-```
-src/
-├── domain/        # Business logic, framework-free and fully tested
-│   ├── actions.ts     # every write: add, complete, postpone, timers, routines…
-│   ├── rollover.ts    # end-of-day processing (idempotent, duplicate-proof)
-│   ├── queries.ts     # read models used by the UI (live queries)
-│   ├── routines.ts    # recurrence rules
-│   └── *.test.ts
-├── views/         # Screens and bottom sheets
-├── components/    # Reusable UI (rows, timer, pickers…)
-└── lib/           # Hooks, formatting, navigation, toasts
-```
-
-The data model separates three things that a naive to-do app mixes up:
-
-- **the item** — what to do (`Task`, or a `Routine` with its recurrence rule);
-- **the entry** — its presence on a given day and what happened that day (done, not done, postponed, skipped);
-- **the session** — time actually spent, from the timer or entered by hand.
-
-Entries have deterministic IDs (`routine + scheduled date + day`), which is what makes the midnight rollover safe to replay any number of times without creating duplicates.
+- **Three separate concepts**: the *item* (what to do: a task or a routine), the *entry* (its presence on a given day and what happened: done, not done, postponed, skipped) and the *session* (time actually spent). A naive to-do app mixes them up.
+- **Idempotent day rollover**: entries have deterministic IDs (`routine + scheduled date + day`), so the end-of-day processing can run any number of times without creating duplicates, even after several days without opening the app, across clock changes, or with a timer running at midnight.
+- **Reliable history**: postponing a task leaves a trace on the original day, and nothing is ever overwritten.
+- **Missed routines don't pile up**: a missed occurrence is recorded as "not done", and optional routines don't lower the completion rate.
+- **Framework-free domain**: all business logic lives in `src/domain/`, independent of React and fully tested, including a randomized usage test.
 
 The full functional specification (in French) is in [`docs/cahier-des-charges.md`](docs/cahier-des-charges.md).
 
 ## Getting started
 
-Don't want to use the live demo? Run the app on your own machine.
-
-**Requirements:** [Node.js](https://nodejs.org/) 22 or later (check with `node -v`) and Git.
-
-**1. Get the code and install dependencies**
+Requires Node.js 22 or newer and Git.
 
 ```bash
 git clone https://github.com/Nathan-Part/todo-list.git
 cd todo-list
 npm install
-```
-
-**2. Start the app**
-
-```bash
 npm run dev
 ```
 
-Open **http://localhost:5173** in your browser. The terminal also prints a *Network* address (e.g. `http://192.168.1.20:5173`): open it on a phone connected to the same Wi-Fi to try the app on mobile.
+Then open http://localhost:5173. The dev server is also exposed on your local network, so you can open it on your phone using your computer's IP address. Note that the offline mode (service worker) only works with a production build: `npm run build && npm run preview`.
 
-**3. Other commands**
+| Script | Description |
+| --- | --- |
+| `npm run dev` | Start the development server |
+| `npm test` | Run the unit tests |
+| `npm run typecheck` | Check the TypeScript types |
+| `npm run build` | Type-check and build for production into `dist/` |
+| `npm run preview` | Serve the production build locally |
 
-```bash
-npm test           # business-rule tests
-npm run typecheck  # TypeScript checks
-npm run build      # production build in dist/
-npm run preview    # serve the production build (offline mode and install prompt work here)
+## Deployment
+
+The app is a fully static site, so it can be hosted for free anywhere.
+
+**GitHub Pages (preconfigured)**: in the repository settings, go to **Pages** and set **Source** to **GitHub Actions**. Every push to `main` then runs `.github/workflows/pages.yml`, which tests, builds and publishes the site.
+
+**Your own domain**: build with the default base path (`npm run build`) and upload `dist/`.
+
+**SFTP (optional)**: `.github/workflows/deploy.yml` uploads the build over SFTP on every push to `main`. It stays disabled until you set the repository variable `DEPLOY_ENABLED=true` and the secrets `SFTP_HOST`, `SFTP_USER`, `SFTP_PASSWORD` and `SFTP_DIR`.
+
+## Install on your phone
+
+Open the live site, then:
+
+- **iPhone (Safari)**: Share → **Add to Home Screen**
+- **Android (Chrome)**: menu ⋮ → **Install app**
+
+## Project structure
+
 ```
-
-All data is stored locally in your browser (IndexedDB): nothing is sent anywhere.
-
-### Install it on a phone
-
-To use it like a native app on an iPhone: open the live demo (or your own deployment) in Safari, then **Share → Add to Home Screen**.
-
-### Deploy your own copy
-
-Every push to `main` publishes the app to GitHub Pages (`.github/workflows/pages.yml`). On a fork, enable Pages in **Settings → Pages → Source: GitHub Actions**. To host it at the root of your own domain instead, build with the default base path (`npm run build`) and upload `dist/`.
-
-### Optional SFTP deployment
-
-`.github/workflows/deploy.yml` uploads the build over SFTP when `main` changes. It stays disabled until you set the repository variable `DEPLOY_ENABLED=true` and the secrets `SFTP_HOST`, `SFTP_USER`, `SFTP_PASSWORD` and `SFTP_DIR`.
+src/
+├── domain/              # Business logic, framework-free and fully tested
+│   ├── actions.ts       # Every write: add, complete, postpone, timers, routines
+│   ├── rollover.ts      # End-of-day processing (idempotent)
+│   ├── queries.ts       # Read models used by the UI (live queries)
+│   ├── routines.ts      # Recurrence rules
+│   └── *.test.ts        # Unit tests
+├── views/               # Screens and bottom sheets
+├── components/          # Reusable UI: rows, timer, pickers, swipe
+└── lib/                 # Hooks, formatting, navigation, toasts
+```
 
 ## Roadmap
 
-- Encrypted automatic backup (manual JSON export/import is available today)
+- Encrypted automatic backup
 - Notifications
 - Multi-device sync
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE) © Nathan-Part
